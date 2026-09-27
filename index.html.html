@@ -282,9 +282,16 @@
         </div>
     </main>
 
-    <button id="adminLockBtn" onclick="toggleAdminPrompt()" class="fixed bottom-6 right-6 z-40 bg-gothicSurface/90 border border-gothicPurple/50 text-gray-400 px-4 py-2 rounded-full text-xs flex items-center gap-2 hover:border-gothicPink transition shadow-2xl">
-        <i data-lucide="lock" class="w-3.5 h-3.5"></i> 木凜管理解鎖 (Delete)
-    </button>
+    <!-- 右下角管理員密碼開關與一鍵匯出按鈕 -->
+    <div class="fixed bottom-6 right-6 z-40 flex flex-col gap-2 items-end">
+        <button id="adminExportBtn" onclick="exportUpdatedHtml()" class="hidden bg-gradient-to-r from-gothicPurpleDeep to-gothicPink text-white px-4 py-2.5 rounded-full text-xs font-bold flex items-center gap-2 hover:scale-105 transition shadow-2xl border border-gothicPink/60">
+            <i data-lucide="download" class="w-4 h-4"></i> 💾 匯出最新 index.html
+        </button>
+        
+        <button id="adminLockBtn" onclick="toggleAdminPrompt()" class="bg-gothicSurface/90 border border-gothicPurple/50 text-gray-400 px-4 py-2 rounded-full text-xs flex items-center gap-2 hover:border-gothicPink transition shadow-2xl">
+            <i data-lucide="lock" class="w-3.5 h-3.5"></i> 木凜管理解鎖 (Delete)
+        </button>
+    </div>
 
     <div id="lightboxModal" class="fixed inset-0 z-50 bg-black/92 backdrop-blur-xl hidden flex items-center justify-center p-4 transition-all duration-300" onclick="closeLightbox()">
         <div class="relative max-w-5xl w-full max-h-[92vh] flex flex-col items-center justify-center" onclick="event.stopPropagation()">
@@ -295,7 +302,7 @@
         </div>
     </div>
 
-    <!-- 支援「貼上網址」與「選擇電腦檔案」雙重模式發布 -->
+    <!-- 新增作品彈窗 (支援貼網址與電腦檔案) -->
     <div id="uploadModal" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-md hidden flex items-center justify-center p-4">
         <div class="gothic-panel rounded-2xl p-6 sm:p-8 max-w-md w-full shadow-2xl relative border border-gothicPink/50">
             <div class="flex justify-between items-center mb-5 border-b border-gothicPurple/30 pb-3">
@@ -313,13 +320,11 @@
                     <input type="text" id="inputTitle" required placeholder="例如：蛇姬降臨・千鳥居夜戰" class="w-full px-3.5 py-2.5 rounded-xl bg-gothicVoid border border-gothicPurple/40 text-white focus:outline-none focus:border-gothicPink">
                 </div>
 
-                <!-- 網址輸入框 -->
                 <div>
                     <label class="block font-bold text-gray-300 mb-1">圖片網址 (.png / .jpg 連結)</label>
                     <input type="text" id="inputImageUrl" placeholder="https://i.imgur.com/xxx.png" class="w-full px-3.5 py-2.5 rounded-xl bg-gothicVoid border border-gothicPurple/40 text-white focus:outline-none focus:border-gothicPink">
                 </div>
 
-                <!-- 本地檔案選擇框 -->
                 <div>
                     <label class="block font-bold text-gray-300 mb-1">或直接從電腦選擇 PNG/JPG 圖片檔案</label>
                     <input type="file" id="inputFile" accept="image/*" onchange="handleFileSelect(event)" class="w-full px-3.5 py-2 rounded-xl bg-gothicVoid border border-gothicPurple/40 text-gray-300 file:mr-4 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-gothicPink file:text-black hover:file:bg-fuchsia-400 cursor-pointer">
@@ -520,7 +525,7 @@
                 if (pwd === ADMIN_PASSWORD) {
                     isAdmin = true;
                     applyAdminUI();
-                    showToast("歡迎木凜！已解鎖新增與刪除權限");
+                    showToast("歡迎木凜！已解鎖新增與匯出權限");
                 } else if (pwd !== null) {
                     alert("密碼錯誤！只有木凜本人可操作。");
                 }
@@ -534,23 +539,25 @@
         function applyAdminUI() {
             const addBtn = document.getElementById('adminAddBtn');
             const deleteBtn = document.getElementById('adminDeleteBtn');
+            const exportBtn = document.getElementById('adminExportBtn');
             const lockBtn = document.getElementById('adminLockBtn');
 
             if (isAdmin) {
                 addBtn.classList.remove('hidden');
                 deleteBtn.classList.remove('hidden');
+                exportBtn.classList.remove('hidden');
                 lockBtn.classList.add('text-gothicPink', 'border-gothicPink');
                 lockBtn.innerHTML = '<i data-lucide="lock-open" class="w-3.5 h-3.5"></i> 木凜 (已解鎖)';
             } else {
                 addBtn.classList.add('hidden');
                 deleteBtn.classList.add('hidden');
+                exportBtn.classList.add('hidden');
                 lockBtn.classList.remove('text-gothicPink', 'border-gothicPink');
                 lockBtn.innerHTML = '<i data-lucide="lock" class="w-3.5 h-3.5"></i> 木凜管理解鎖 (Delete)';
             }
             lucide.createIcons();
         }
 
-        // 讀取電腦本地圖片
         function handleFileSelect(e) {
             const file = e.target.files[0];
             if (file) {
@@ -562,7 +569,6 @@
             }
         }
 
-        // 智慧型發布：優先使用電腦檔案，沒有檔案就讀取網址
         function handleAddNewArtwork(e) {
             e.preventDefault();
             if (!isAdmin) return;
@@ -591,9 +597,8 @@
             galleryData.unshift(newItem);
             closeModal('uploadModal');
             loadArtwork(0);
-            showToast("成功加入作品！");
+            showToast("成功加入作品！請記得點擊右下角「💾 匯出最新 index.html」喔！");
 
-            // 重置
             e.target.reset();
             localSelectedImage = "";
         }
@@ -607,8 +612,31 @@
                 }
                 currentIndex = 0;
                 loadArtwork(0);
-                showToast("作品已刪除");
+                showToast("作品已刪除！請記得點擊右下角「💾 匯出最新 index.html」保存檔案！");
             }
+        }
+
+        // 🌟 核心新功能：一鍵自動匯出打包好新資料的 index.html
+        function exportUpdatedHtml() {
+            if (!isAdmin) return;
+
+            let htmlDoc = document.documentElement.outerHTML;
+            const jsonString = JSON.stringify(galleryData, null, 12);
+            
+            // 智慧防護：將當前最新資料直接寫入匯出檔案的原始碼中
+            htmlDoc = htmlDoc.replace(/let galleryData = \[[\s\S]*?\];/, `let galleryData = ${jsonString};`);
+
+            const blob = new Blob([htmlDoc], { type: 'text/html;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'index.html';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+
+            showToast("🎉 最新 index.html 已下載！請把它拖去 GitHub 蓋掉舊檔案！");
         }
 
         function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
