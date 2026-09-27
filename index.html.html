@@ -192,7 +192,7 @@
                     <div class="gothic-corner gothic-corner-bl"></div>
                     <div class="gothic-corner gothic-corner-br"></div>
 
-                    <!-- 圖片畫布 (適應直式、橫式不變形) -->
+                    <!-- 圖片畫布 -->
                     <div class="relative w-full h-[380px] sm:h-[500px] rounded-2xl overflow-hidden bg-gothicVoid border border-gothicPurple/30 flex items-center justify-center p-2 group/imgContainer shadow-inner">
                         <img id="bgBlurImage" class="absolute inset-0 w-full h-full object-cover blur-3xl opacity-30 scale-110 pointer-events-none transition-all duration-700" src="" alt="Aura">
                         
@@ -262,7 +262,7 @@
                         </div>
 
                         <div id="poemContainer" class="hidden opacity-0 transform translate-y-4 transition-all duration-500 ease-out w-full flex justify-center">
-    <div id="poemTextWrapper" class="font-serif text-sm leading-relaxed text-left px-5 py-5 rounded-2xl bg-gothicVoid/90 border border-gothicPink/50 shadow-[0_0_25px_rgba(236,72,153,0.2)] w-full relative max-h-[320px] overflow-y-auto">
+                            <div id="poemTextWrapper" class="font-serif text-sm leading-relaxed text-left px-5 py-5 rounded-2xl bg-gothicVoid/90 border border-gothicPink/50 shadow-[0_0_25px_rgba(236,72,153,0.2)] w-full relative max-h-[320px] overflow-y-auto">
                                 <div class="absolute -top-3 right-4 mulin-seal text-[11px] font-black px-2.5 py-0.5 rounded shadow">
                                     木凜鑑賞
                                 </div>
@@ -282,7 +282,6 @@
                             <button onclick="copyPoem()" class="flex items-center gap-1.5 hover:text-gothicPink transition">
                                 <i data-lucide="copy" class="w-4 h-4"></i> 複製 Prompt 題詞
                             </button>
-                            <!-- 僅解鎖顯示刪除 -->
                             <button id="adminDeleteBtn" onclick="deleteCurrentArtwork()" class="hidden text-red-400 hover:text-red-300 transition flex items-center gap-1">
                                 <i data-lucide="trash-2" class="w-3.5 h-3.5"></i> 刪除此作品
                             </button>
@@ -310,7 +309,7 @@
         </div>
     </div>
 
-    <!-- 新增作品彈窗 (支援電腦本地檔案上傳) -->
+    <!-- 新增作品彈窗 (貼上 Imgur 或圖床連結) -->
     <div id="uploadModal" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-md hidden flex items-center justify-center p-4">
         <div class="gothic-panel rounded-2xl p-6 sm:p-8 max-w-md w-full shadow-2xl relative border border-gothicPink/50">
             <div class="flex justify-between items-center mb-5 border-b border-gothicPurple/30 pb-3">
@@ -323,31 +322,31 @@
             </div>
 
             <form onsubmit="handleAddNewArtwork(event)" class="space-y-4 text-xs">
-    <div>
-        <label class="block font-bold text-gray-300 mb-1">作品名稱</label>
-        <input type="text" id="inputTitle" required placeholder="例如：蛇姬降臨・千鳥居夜戰" class="w-full px-3.5 py-2.5 rounded-xl bg-gothicVoid border border-gothicPurple/40 text-white focus:outline-none focus:border-gothicPink">
-    </div>
+                <div>
+                    <label class="block font-bold text-gray-300 mb-1">作品名稱</label>
+                    <input type="text" id="inputTitle" required placeholder="例如：蛇姬降臨・千鳥居夜戰" class="w-full px-3.5 py-2.5 rounded-xl bg-gothicVoid border border-gothicPurple/40 text-white focus:outline-none focus:border-gothicPink">
+                </div>
 
-    <div>
-        <label class="block font-bold text-gray-300 mb-1">圖片網址 (貼上 Imgur 連結)</label>
-        <input type="url" id="inputImageUrl" required placeholder="https://i.imgur.com/xxx.jpg" class="w-full px-3.5 py-2.5 rounded-xl bg-gothicVoid border border-gothicPurple/40 text-white focus:outline-none focus:border-gothicPink">
-    </div>
+                <div>
+                    <label class="block font-bold text-gray-300 mb-1">圖片網址 (貼上 Imgur 或 ImgBB 連結)</label>
+                    <input type="url" id="inputImageUrl" required placeholder="https://i.imgur.com/xxx.jpg" class="w-full px-3.5 py-2.5 rounded-xl bg-gothicVoid border border-gothicPurple/40 text-white focus:outline-none focus:border-gothicPink">
+                </div>
 
-    <div>
-        <label class="block font-bold text-gray-300 mb-1">風格標籤</label>
-        <input type="text" id="inputStyle" required placeholder="例如：日系奇幻 / 電影級" class="w-full px-3.5 py-2.5 rounded-xl bg-gothicVoid border border-gothicPurple/40 text-white focus:outline-none focus:border-gothicPink">
-    </div>
+                <div>
+                    <label class="block font-bold text-gray-300 mb-1">風格標籤</label>
+                    <input type="text" id="inputStyle" required placeholder="例如：日系奇幻 / 電影級" class="w-full px-3.5 py-2.5 rounded-xl bg-gothicVoid border border-gothicPurple/40 text-white focus:outline-none focus:border-gothicPink">
+                </div>
 
-    <div>
-        <label class="block font-bold text-gray-300 mb-1">生圖 Prompt 題詞</label>
-        <textarea id="inputPoem" rows="4" required placeholder="請貼上 AI 題詞與提示詞..." class="w-full px-3.5 py-2.5 rounded-xl bg-gothicVoid border border-gothicPurple/40 text-white focus:outline-none focus:border-gothicPink font-mono"></textarea>
-    </div>
+                <div>
+                    <label class="block font-bold text-gray-300 mb-1">生圖 Prompt 題詞</label>
+                    <textarea id="inputPoem" rows="4" required placeholder="請貼上 AI 題詞與提示詞..." class="w-full px-3.5 py-2.5 rounded-xl bg-gothicVoid border border-gothicPurple/40 text-white focus:outline-none focus:border-gothicPink font-mono"></textarea>
+                </div>
 
-    <div class="flex gap-3 pt-2">
-        <button type="button" onclick="closeModal('uploadModal')" class="w-1/2 py-3 rounded-xl border border-gothicPurple/40 text-gray-300 hover:bg-gothicVoid">取消</button>
-        <button type="submit" class="w-1/2 py-3 rounded-xl bg-gradient-to-r from-gothicPurpleDeep to-gothicPink font-bold text-white shadow-lg hover:scale-105 transition">發布作品</button>
-    </div>
-</form>
+                <div class="flex gap-3 pt-2">
+                    <button type="button" onclick="closeModal('uploadModal')" class="w-1/2 py-3 rounded-xl border border-gothicPurple/40 text-gray-300 hover:bg-gothicVoid">取消</button>
+                    <button type="submit" class="w-1/2 py-3 rounded-xl bg-gradient-to-r from-gothicPurpleDeep to-gothicPink font-bold text-white shadow-lg hover:scale-105 transition">發布作品</button>
+                </div>
+            </form>
         </div>
     </div>
 
@@ -359,9 +358,8 @@
 
     <script>
         let isAdmin = false;
-        const ADMIN_PASSWORD = "mulin"; // 您本人的解鎖密碼
+        const ADMIN_PASSWORD = "mulin";
 
-        // 作品資料庫 (預設載入蛇姬作品與完整 Prompt)
         let galleryData = [
             {
                 id: 1,
@@ -388,7 +386,6 @@
         let currentIndex = 0;
         let isRevealed = false;
         let isVertical = false;
-        let tempBase64Image = "";
 
         window.onload = function() {
             lucide.createIcons();
@@ -524,7 +521,6 @@
             showToast("心動 +1 💖");
         }
 
-        /* ----- 管理員解鎖邏輯 ----- */
         function toggleAdminPrompt() {
             if (!isAdmin) {
                 let pwd = prompt("請輸入木凜管理者解鎖密碼：");
@@ -561,28 +557,18 @@
             lucide.createIcons();
         }
 
-        // 讀取電腦本地選擇的圖片檔案
-        function handleFileSelect(e) {
-            const file = e.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(evt) {
-                    tempBase64Image = evt.target.result;
-                };
-                reader.readAsDataURL(file);
-            }
-        }
-
+        // 核心修復：正確讀取網址貼上的圖片並發布
         function handleAddNewArtwork(e) {
             e.preventDefault();
             if (!isAdmin) return;
 
             const title = document.getElementById('inputTitle').value;
+            const imageUrl = document.getElementById('inputImageUrl').value;
             const style = document.getElementById('inputStyle').value;
             const poem = document.getElementById('inputPoem').value;
 
-            if (!tempBase64Image) {
-                alert("請從電腦選擇圖片！");
+            if (!imageUrl) {
+                alert("請填寫圖片網址！");
                 return;
             }
 
@@ -590,7 +576,7 @@
                 id: Date.now(),
                 title: title,
                 style: style,
-                image: tempBase64Image,
+                image: imageUrl,
                 poem: poem,
                 likes: 1
             };
@@ -600,9 +586,7 @@
             loadArtwork(0);
             showToast("成功加入作品！");
             
-            // 重置欄位
             e.target.reset();
-            tempBase64Image = "";
         }
 
         function deleteCurrentArtwork() {
@@ -630,7 +614,6 @@
             }, 2500);
         }
 
-        // 背景微光粒子動畫
         function initGothicCanvas() {
             const canvas = document.getElementById('gothicCanvas');
             const ctx = canvas.getContext('2d');
