@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="zh-Hant" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>木凜提詞放置區</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=UnifrakturMaguntia&family=M+PLUS+Rounded+1c:wght@400;700;900&family=Noto+Serif+TC:wght@600;900&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        gothicVoid: '#07050a',
+                        gothicDark: '#0e0816',
+                        gothicSurface: '#160d24',
+                        gothicPurple: '#7c3aed',
+                        gothicPurpleDeep: '#4c1d95',
+                        gothicPink: '#ec4899',
+                        gothicMagenta: '#f43f5e',
+                        gothicSilver: '#e2e8f0',
+                    },
+                    fontFamily: {
+                        sans: ['"M PLUS Rounded 1c"', 'sans-serif'],
+                        serif: ['"Noto Serif TC"', 'serif'],
+                        gothicTitle: ['"UnifrakturMaguntia"', '"Cinzel Decorative"', 'serif'],
+                        cinzel: ['"Cinzel Decorative"', 'serif']
+                    },
+                    animation: {
+                        'pulse-glow': 'pulseGlow 3s infinite alternate ease-in-out',
+                        'float': 'floatAnim 5s ease-in-out infinite',
+                    },
+                    keyframes: {
+                        pulseGlow: {
+                            '0%': { boxShadow: '0 0 15px rgba(236,72,153,0.3), inset 0 0 10px rgba(124,58,237,0.2)' },
+                            '100%': { boxShadow: '0 0 35px rgba(244,63,94,0.6), inset 0 0 25px rgba(236,72,153,0.4)' }
+                        },
+                        floatAnim: {
+                            '0%, 100%': { transform: 'translateY(0px)' },
+                            '50%': { transform: 'translateY(-8px)' }
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #07050a;
+            color: #f1f5f9;
+            font-family: 'M PLUS Rounded 1c', sans-serif;
+            background-image: 
+                radial-gradient(circle at 50% 0%, rgba(124, 58, 237, 0.25) 0%, transparent 65%),
+                radial-gradient(circle at 85% 85%, rgba(236, 72, 153, 0.15) 0%, transparent 55%),
+                radial-gradient(circle at 15% 75%, rgba(76, 29, 149, 0.2) 0%, transparent 50%),
+                radial-gradient(rgba(244, 63, 94, 0.08) 1px, transparent 1px);
+            background-size: 100% 100%, 100% 100%, 100% 100%, 28px 28px;
+            min-height: 100vh;
+        }
+
+        .gothic-panel {
+            background: linear-gradient(140deg, rgba(22, 13, 36, 0.88), rgba(11, 7, 18, 0.95));
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(236, 72, 153, 0.25);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.8), inset 0 0 15px rgba(124, 58, 237, 0.15);
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .interactive-frame {
+            position: relative;
+            border-radius: 1.25rem;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .interactive-frame::after {
+            content: '';
+            position: absolute;
+            inset: -2px;
+            border-radius: 1.35rem;
+            background: linear-gradient(135deg, rgba(236,72,153,0.3), transparent 40%, rgba(124,58,237,0.4));
+            z-index: -1;
+            opacity: 0.5;
+            transition: all 0.4s ease;
+        }
+
+        .interactive-frame:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px rgba(124, 58, 237, 0.35), 0 0 25px rgba(236, 72, 153, 0.25);
+            border-color: rgba(244, 63, 94, 0.7);
+        }
+
+        .interactive-frame:hover::after {
+            opacity: 1;
+            background: linear-gradient(135deg, rgba(244,63,94,0.8), rgba(236,72,153,0.5), rgba(124,58,237,0.8));
+        }
+
+        .gothic-corner {
+            position: absolute;
+            width: 22px;
+            height: 22px;
+            pointer-events: none;
+            z-index: 25;
+            transition: all 0.4s ease;
+        }
+        .gothic-corner-tl { top: 6px; left: 6px; border-top: 2px solid #ec4899; border-left: 2px solid #ec4899; }
+        .gothic-corner-tr { top: 6px; right: 6px; border-top: 2px solid #ec4899; border-right: 2px solid #ec4899; }
+        .gothic-corner-bl { bottom: 6px; left: 6px; border-bottom: 2px solid #ec4899; border-left: 2px solid #ec4899; }
+        .gothic-corner-br { bottom: 6px; right: 6px; border-bottom: 2px solid #ec4899; border-right: 2px solid #ec4899; }
+
+        .interactive-frame:hover .gothic-corner {
+            border-color: #f43f5e;
+            box-shadow: 0 0 10px rgba(244, 63, 94, 0.8);
+            width: 28px; height: 28px;
+        }
+
+        .writing-vertical {
+            writing-mode: vertical-rl;
+            text-orientation: upright;
+            letter-spacing: 0.35em;
+        }
+
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #07050a; }
+        ::-webkit-scrollbar-thumb { background: #7c3aed; border-radius: 999px; }
+        ::-webkit-scrollbar-thumb:hover { background: #ec4899; }
+
+        .mulin-seal {
+            border: 2px solid #f43f5e;
+            color: #f43f5e;
+            background: rgba(244, 63, 94, 0.08);
+            font-family: 'Noto Serif TC', serif;
+            box-shadow: 0 0 12px rgba(244, 63, 94, 0.4);
+            transform: rotate(-8deg);
+        }
+    </style>
+</head>
+<body class="flex flex-col justify-between relative overflow-x-hidden selection:bg-gothicPink selection:text-black min-h-screen">
+
+    <!-- 粒子背景 Canvas -->
+    <canvas id="gothicCanvas" class="fixed inset-0 pointer-events-none z-0 opacity-80"></canvas>
+
+    <!-- 頂部 Header -->
+    <header class="relative z-10 w-full max-w-7xl mx-auto px-4 py-8 flex flex-col sm:flex-row items-center justify-between gap-6 border-b border-gothicPurple/30">
+        <div class="flex items-center gap-4 text-center sm:text-left">
+            <div class="relative w-12 h-12 flex-shrink-0 flex items-center justify-center animate-float">
+                <div class="absolute inset-0 rounded-full bg-gothicPink/20 blur-xl"></div>
+                <svg viewBox="0 0 100 100" class="w-full h-full drop-shadow-[0_0_15px_rgba(236,72,153,0.9)]">
+                    <circle cx="50" cy="50" r="42" stroke="#7c3aed" stroke-width="2" fill="none" stroke-dasharray="6,4"/>
+                    <path d="M 50 15 L 50 85 M 20 40 L 80 40" stroke="#f43f5e" stroke-width="3.5" stroke-linecap="round"/>
+                    <polygon points="50,28 62,50 50,72 38,50" fill="#ec4899" opacity="0.85"/>
+                    <circle cx="50" cy="50" r="4" fill="#ffffff"/>
+                </svg>
+            </div>
+            <div>
+                <div class="flex items-center gap-2 justify-center sm:justify-start">
+                    <span class="text-[10px] tracking-[0.3em] font-cinzel text-gothicPink font-bold uppercase">Aesthetic Gothic</span>
+                    <span class="text-gothicPurple/60 text-xs">•</span>
+                    <span class="text-[10px] tracking-[0.3em] font-serif text-gray-400">木凜典藏</span>
+                </div>
+                <h1 class="text-3xl sm:text-4xl font-black font-serif tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-gothicPink via-fuchsia-200 to-gothicPurple drop-shadow-[0_0_20px_rgba(236,72,153,0.5)]">
+                    木凜提詞放置區
+                </h1>
+            </div>
+        </div>
+
+        <!-- 管理員新增按鈕 (僅解鎖顯示) -->
+        <div class="flex items-center gap-3">
+            <button id="adminAddBtn" onclick="openModal('uploadModal')" class="hidden group relative px-5 py-2.5 rounded-xl bg-gothicSurface text-white font-bold text-xs tracking-wider border border-gothicPink/40 shadow-lg hover:border-gothicPink hover:shadow-[0_0_20px_rgba(236,72,153,0.4)] transition-all duration-300 flex items-center gap-2 overflow-hidden">
+                <span class="absolute inset-0 bg-gradient-to-r from-gothicPurpleDeep/40 to-gothicPink/30 opacity-0 group-hover:opacity-100 transition-opacity"></span>
+                <i data-lucide="plus-circle" class="w-4 h-4 text-gothicPink group-hover:scale-110 transition-transform"></i>
+                <span class="relative z-10">新增生圖與題詞</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- 主內容容器 -->
+    <main class="relative z-10 w-full max-w-7xl mx-auto px-4 py-8 my-auto">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
+            
+            <!-- 左欄：圖片展示區 -->
+            <section class="lg:col-span-7 flex flex-col">
+                <div class="gothic-panel interactive-frame p-4 sm:p-6 flex flex-col justify-between h-full relative group">
+                    <div class="gothic-corner gothic-corner-tl"></div>
+                    <div class="gothic-corner gothic-corner-tr"></div>
+                    <div class="gothic-corner gothic-corner-bl"></div>
+                    <div class="gothic-corner gothic-corner-br"></div>
+
+                    <!-- 圖片畫布 (適應直式、橫式不變形) -->
+                    <div class="relative w-full h-[380px] sm:h-[500px] rounded-2xl overflow-hidden bg-gothicVoid border border-gothicPurple/30 flex items-center justify-center p-2 group/imgContainer shadow-inner">
+                        <img id="bgBlurImage" class="absolute inset-0 w-full h-full object-cover blur-3xl opacity-30 scale-110 pointer-events-none transition-all duration-700" src="" alt="Aura">
+                        
+                        <img id="mainImage" src="" alt="木凜生圖" onclick="openLightbox()"
+                             class="relative z-10 max-w-full max-h-full object-contain rounded-xl cursor-pointer transition-all duration-500 hover:scale-[1.02] shadow-[0_0_30px_rgba(0,0,0,0.9)]">
+
+                        <div class="absolute top-4 left-4 z-20 bg-gothicVoid/90 backdrop-blur-md px-4 py-1.5 rounded-full border border-gothicPink/40 text-xs font-bold text-gothicPink flex items-center gap-1.5 shadow-xl">
+                            <i data-lucide="sparkles" class="w-3.5 h-3.5 text-gothicMagenta"></i>
+                            <span id="artworkStyle">電影質感</span>
+                        </div>
+
+                        <button onclick="openLightbox()" class="absolute bottom-4 right-4 z-20 px-4 py-2 rounded-xl bg-gothicVoid/90 hover:bg-gothicPink text-white hover:text-black border border-gothicPink/50 transition-all duration-300 shadow-2xl flex items-center gap-2 text-xs font-bold opacity-90 hover:opacity-100">
+                            <i data-lucide="maximize-2" class="w-4 h-4"></i>
+                            <span>點擊彈出大圖</span>
+                        </button>
+                    </div>
+
+                    <!-- 縮圖選擇 Bar -->
+                    <div class="mt-5 flex items-center gap-3 overflow-x-auto pb-2 pt-1 px-1" id="thumbnailList"></div>
+                </div>
+            </section>
+
+            <!-- 右欄：題詞顯現互動區 -->
+            <section class="lg:col-span-5 flex flex-col">
+                <div class="gothic-panel interactive-frame p-6 sm:p-8 flex flex-col justify-between min-h-[480px] relative">
+                    <div class="gothic-corner gothic-corner-tl"></div>
+                    <div class="gothic-corner gothic-corner-tr"></div>
+                    <div class="gothic-corner gothic-corner-bl"></div>
+                    <div class="gothic-corner gothic-corner-br"></div>
+
+                    <div>
+                        <div class="flex items-center justify-between border-b border-gothicPurple/30 pb-4">
+                            <div class="flex items-center gap-2.5">
+                                <span class="px-2.5 py-0.5 rounded-md bg-gothicPink/20 text-gothicPink border border-gothicPink/40 font-serif text-xs font-bold">木凜作品</span>
+                                <h2 id="artworkTitle" class="font-serif font-bold text-xl sm:text-2xl text-white tracking-wide">作品名稱</h2>
+                            </div>
+                            
+                            <div class="flex items-center gap-2">
+                                <button onclick="toggleLayout()" class="p-2 rounded-xl bg-gothicVoid hover:bg-gothicPurple/30 text-gothicPink border border-gothicPurple/40 transition hover:border-gothicPink" title="切換直排/橫排">
+                                    <i data-lucide="align-right" class="w-4 h-4"></i>
+                                </button>
+                                <button id="likeBtn" onclick="toggleLike()" class="px-3 py-2 rounded-xl bg-gothicVoid hover:bg-gothicPink/20 text-gray-300 border border-gothicPurple/40 hover:border-gothicPink transition flex items-center gap-1.5 text-xs">
+                                    <i data-lucide="heart" class="w-4 h-4 text-gothicPink fill-gothicPink"></i>
+                                    <span id="likeCount" class="font-bold text-white">0</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center justify-between my-3 text-xs text-gray-400">
+                            <button onclick="prevArtwork()" class="flex items-center gap-1 hover:text-gothicPink transition">
+                                <i data-lucide="chevron-left" class="w-4 h-4"></i> 上一張
+                            </button>
+                            <span id="galleryCounter" class="font-bold text-gothicPink font-cinzel">1 / 1</span>
+                            <button onclick="nextArtwork()" class="flex items-center gap-1 hover:text-gothicPink transition">
+                                下一張 <i data-lucide="chevron-right" class="w-4 h-4"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- 題詞隱藏與顯現框 -->
+                    <div class="my-auto py-4 flex items-center justify-center min-h-[220px] relative">
+                        <div id="unrevealedState" class="text-center flex flex-col items-center gap-4 transition-all duration-300">
+                            <div class="w-20 h-20 rounded-2xl bg-gradient-to-br from-gothicPurpleDeep/80 to-gothicVoid border border-gothicPink/50 flex items-center justify-center text-gothicPink animate-pulse-glow">
+                                <i data-lucide="lock" class="w-8 h-8"></i>
+                            </div>
+                            <p class="text-xs sm:text-sm font-medium text-gray-400">點擊下方按鈕，解鎖木凜生圖 Prompt 題詞...</p>
+                        </div>
+
+                        <div id="poemContainer" class="hidden opacity-0 transform translate-y-4 transition-all duration-500 ease-out w-full flex justify-center">
+    <div id="poemTextWrapper" class="font-serif text-sm leading-relaxed text-left px-5 py-5 rounded-2xl bg-gothicVoid/90 border border-gothicPink/50 shadow-[0_0_25px_rgba(236,72,153,0.2)] w-full relative max-h-[320px] overflow-y-auto">
+                                <div class="absolute -top-3 right-4 mulin-seal text-[11px] font-black px-2.5 py-0.5 rounded shadow">
+                                    木凜鑑賞
+                                </div>
+                                <p id="poemContent" class="whitespace-pre-wrap tracking-wide text-pink-100/90 font-mono"></p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 底部顯現按鈕 -->
+                    <div class="flex flex-col gap-3">
+                        <button id="revealBtn" onclick="toggleReveal()" class="w-full py-4 px-6 rounded-xl font-bold text-white bg-gradient-to-r from-gothicPurpleDeep via-gothicPink to-gothicPurpleDeep bg-[length:200%_100%] animate-pulse-glow hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 flex items-center justify-center gap-2 shadow-2xl group text-base border border-gothicPink/50">
+                            <i data-lucide="sparkles" class="w-5 h-5 transition-transform group-hover:rotate-45 text-amber-200"></i>
+                            <span id="revealBtnText">✨ 顯現題詞 ✨</span>
+                        </button>
+
+                        <div id="revealedActions" class="hidden flex items-center justify-between px-2 text-xs text-gray-400">
+                            <button onclick="copyPoem()" class="flex items-center gap-1.5 hover:text-gothicPink transition">
+                                <i data-lucide="copy" class="w-4 h-4"></i> 複製 Prompt 題詞
+                            </button>
+                            <!-- 僅解鎖顯示刪除 -->
+                            <button id="adminDeleteBtn" onclick="deleteCurrentArtwork()" class="hidden text-red-400 hover:text-red-300 transition flex items-center gap-1">
+                                <i data-lucide="trash-2" class="w-3.5 h-3.5"></i> 刪除此作品
+                            </button>
+                        </div>
+                    </div>
+
+                </div>
+            </section>
+
+        </div>
+    </main>
+
+    <!-- 右下角管理員密碼開關 -->
+    <button id="adminLockBtn" onclick="toggleAdminPrompt()" class="fixed bottom-6 right-6 z-40 bg-gothicSurface/90 border border-gothicPurple/50 text-gray-400 px-4 py-2 rounded-full text-xs flex items-center gap-2 hover:border-gothicPink transition shadow-2xl">
+        <i data-lucide="lock" class="w-3.5 h-3.5"></i> 木凜管理解鎖 (Delete)
+    </button>
+
+    <!-- 全螢幕大圖彈窗 -->
+    <div id="lightboxModal" class="fixed inset-0 z-50 bg-black/92 backdrop-blur-xl hidden flex items-center justify-center p-4 transition-all duration-300" onclick="closeLightbox()">
+        <div class="relative max-w-5xl w-full max-h-[92vh] flex flex-col items-center justify-center" onclick="event.stopPropagation()">
+            <button onclick="closeLightbox()" class="absolute -top-12 right-0 text-white hover:text-gothicPink transition p-2 bg-gothicSurface rounded-full border border-gothicPink/40">
+                <i data-lucide="x" class="w-6 h-6"></i>
+            </button>
+            <img id="lightboxImage" src="" alt="Full Preview" class="max-w-full max-h-[82vh] rounded-2xl object-contain border-2 border-gothicPink/60 shadow-[0_0_60px_rgba(236,72,153,0.35)]">
+        </div>
+    </div>
+
+    <!-- 新增作品彈窗 (支援電腦本地檔案上傳) -->
+    <div id="uploadModal" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-md hidden flex items-center justify-center p-4">
+        <div class="gothic-panel rounded-2xl p-6 sm:p-8 max-w-md w-full shadow-2xl relative border border-gothicPink/50">
+            <div class="flex justify-between items-center mb-5 border-b border-gothicPurple/30 pb-3">
+                <h3 class="font-bold text-lg text-white flex items-center gap-2 font-serif">
+                    <i data-lucide="image-plus" class="w-5 h-5 text-gothicPink"></i> 新增木凜作品與題詞
+                </h3>
+                <button onclick="closeModal('uploadModal')" class="text-gray-400 hover:text-white">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <form onsubmit="handleAddNewArtwork(event)" class="space-y-4 text-xs">
+                <div>
+                    <label class="block font-bold text-gray-300 mb-1">作品名稱</label>
+                    <input type="text" id="inputTitle" required placeholder="例如：蛇姬降臨・千鳥居夜戰" class="w-full px-3.5 py-2.5 rounded-xl bg-gothicVoid border border-gothicPurple/40 text-white focus:outline-none focus:border-gothicPink">
+                </div>
+
+                <div>
+                    <label class="block font-bold text-gray-300 mb-1">選擇電腦圖片檔案</label>
+                    <input type="file" id="inputFile" accept="image/*" required onchange="handleFileSelect(event)" class="w-full px-3.5 py-2 rounded-xl bg-gothicVoid border border-gothicPurple/40 text-gray-300 file:mr-4 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-gothicPink file:text-black hover:file:bg-fuchsia-400 cursor-pointer">
+                </div>
+
+                <div>
+                    <label class="block font-bold text-gray-300 mb-1">風格標籤</label>
+                    <input type="text" id="inputStyle" required placeholder="例如：日系奇幻 / 電影級" class="w-full px-3.5 py-2.5 rounded-xl bg-gothicVoid border border-gothicPurple/40 text-white focus:outline-none focus:border-gothicPink">
+                </div>
+
+                <div>
+                    <label class="block font-bold text-gray-300 mb-1">生圖 Prompt 題詞</label>
+                    <textarea id="inputPoem" rows="4" required placeholder="請貼上 AI 題詞與提示詞..." class="w-full px-3.5 py-2.5 rounded-xl bg-gothicVoid border border-gothicPurple/40 text-white focus:outline-none focus:border-gothicPink font-mono"></textarea>
+                </div>
+
+                <div class="flex gap-3 pt-2">
+                    <button type="button" onclick="closeModal('uploadModal')" class="w-1/2 py-3 rounded-xl border border-gothicPurple/40 text-gray-300 hover:bg-gothicVoid">取消</button>
+                    <button type="submit" class="w-1/2 py-3 rounded-xl bg-gradient-to-r from-gothicPurpleDeep to-gothicPink font-bold text-white shadow-lg hover:scale-105 transition">發布作品</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Toast 提示框 -->
+    <div id="toast" class="fixed bottom-6 right-6 bg-gothicSurface border border-gothicPink text-white px-5 py-3 rounded-xl shadow-2xl text-xs flex items-center gap-2 transform translate-y-20 opacity-0 transition-all duration-300 z-50">
+        <i data-lucide="sparkles" class="w-4 h-4 text-gothicPink"></i>
+        <span id="toastMsg">操作成功</span>
+    </div>
+
+    <script>
+        let isAdmin = false;
+        const ADMIN_PASSWORD = "mulin"; // 您本人的解鎖密碼
+
+        // 作品資料庫 (預設載入蛇姬作品與完整 Prompt)
+        let galleryData = [
+            {
+                id: 1,
+                title: "蛇姬降臨・千鳥居夜戰",
+                style: "電影級奇幻",
+                image: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1000",
+                poem: `(高品質，最佳畫質，masterpiece，超高解析度，8K，寫實真人攝影風格，RAW photo style，photorealistic fantasy，epic cinematic photography，dark Japanese fantasy，電影級光影，史詩尺度，柔霧光暈，立體景深，極致細節，神圖，cinematic masterpiece，blockbuster movie still)
+
+**主題：**
+「蛇姬降臨・千鳥居夜戰」——捨棄單純舞蹈感，改成奇幻電影女主正式登場的震撼瞬間。暴風雨過後的深夜神社，成排鳥居向遠方無限延伸，蛇姬從水霧深處緩緩現身；龐大黑紫蛇尾盤據整座石階，帶著如妖神降臨般的神秘壓迫感。
+
+**人物：**
+單人女性蛇姬，人物如圖，保留原本人設、身材比例與氣質特徵。精緻東方美人五官，白皙通透肌膚，真實毛孔與自然皮膚紋理，神情不再微笑，而是安靜、冷冽、不可接近。下巴略微抬起，目光直視遠方。完整 Lamia 蛇女形態，(lamia:1.4), (serpent tail:1.5), (lower body replaced by snake tail:1.5)，(Black and purple serpent tail:1.3)。
+
+**服裝造型：**
+(Black and Pink kimono:1.3)，黑紫桃色華麗振袖和服，黑色絲緞在夜色中呈現深邃高級光澤，衣襟與袖口以紫紅色漸層收邊。金銀絲刺繡彼岸花、藤蔓與蛇紋。
+
+**核心關鍵詞：**
+(lamia:1.4), (serpent tail:1.5), (lower body replaced by snake tail:1.5), (no human legs:1.5), (Black and Pink kimono:1.3), (Black and purple serpent tail:1.3), (tail and kimono train:1.4), huge serpent tail, massive scale, seamless human-to-serpent anatomy, realistic snake scales, dramatic perspective, extreme foreground, layered depth, low angle shot, cinematic composition, windblown hair, wet reflections, volumetric fog, god rays, cinematic backlight, purple rim light, wet surface reflections, deep shadow, high dynamic range, foreground bokeh, depth separation, masterpiece, 神圖感。`,
+                likes: 999
+            }
+        ];
+
+        let currentIndex = 0;
+        let isRevealed = false;
+        let isVertical = false;
+        let tempBase64Image = "";
+
+        window.onload = function() {
+            lucide.createIcons();
+            initGothicCanvas();
+            renderGalleryThumbnails();
+            loadArtwork(0);
+
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Delete') toggleAdminPrompt();
+                if (e.key === 'Escape') closeLightbox();
+            });
+        };
+
+        function renderGalleryThumbnails() {
+            const listContainer = document.getElementById('thumbnailList');
+            listContainer.innerHTML = '';
+
+            galleryData.forEach((item, index) => {
+                const thumb = document.createElement('button');
+                thumb.onclick = () => loadArtwork(index);
+                thumb.className = `relative flex-shrink-0 w-16 h-16 sm:w-20 sm:h-20 rounded-xl overflow-hidden border-2 transition-all duration-300 ${
+                    index === currentIndex 
+                        ? 'border-gothicPink scale-105 shadow-[0_0_15px_rgba(236,72,153,0.8)]' 
+                        : 'border-gothicPurple/30 opacity-40 hover:opacity-100 hover:border-gothicPink'
+                }`;
+                thumb.innerHTML = `<img src="${item.image}" alt="${item.title}" class="w-full h-full object-cover">`;
+                listContainer.appendChild(thumb);
+            });
+
+            document.getElementById('galleryCounter').textContent = `${currentIndex + 1} / ${galleryData.length}`;
+        }
+
+        function loadArtwork(index) {
+            if (galleryData.length === 0) return;
+            currentIndex = index;
+            const current = galleryData[currentIndex];
+
+            isRevealed = false;
+            document.getElementById('unrevealedState').classList.remove('hidden', 'opacity-0');
+            
+            const poemBox = document.getElementById('poemContainer');
+            poemBox.classList.add('hidden', 'opacity-0', 'translate-y-4');
+            document.getElementById('revealedActions').classList.add('hidden');
+            document.getElementById('revealBtnText').textContent = "✨ 顯現題詞 ✨";
+
+            document.getElementById('mainImage').src = current.image;
+            document.getElementById('bgBlurImage').src = current.image;
+            document.getElementById('artworkStyle').textContent = current.style;
+
+            document.getElementById('artworkTitle').textContent = current.title;
+            document.getElementById('poemContent').textContent = current.poem;
+            document.getElementById('likeCount').textContent = current.likes;
+
+            renderGalleryThumbnails();
+        }
+
+        function nextArtwork() {
+            let nextIndex = (currentIndex + 1) % galleryData.length;
+            loadArtwork(nextIndex);
+        }
+
+        function prevArtwork() {
+            let prevIndex = (currentIndex - 1 + galleryData.length) % galleryData.length;
+            loadArtwork(prevIndex);
+        }
+
+        function toggleReveal() {
+            isRevealed = !isRevealed;
+
+            const unrevealedState = document.getElementById('unrevealedState');
+            const poemBox = document.getElementById('poemContainer');
+            const btnText = document.getElementById('revealBtnText');
+            const revealedActions = document.getElementById('revealedActions');
+
+            if (isRevealed) {
+                unrevealedState.classList.add('opacity-0');
+                setTimeout(() => {
+                    unrevealedState.classList.add('hidden');
+                    poemBox.classList.remove('hidden');
+                    void poemBox.offsetWidth;
+                    poemBox.classList.remove('opacity-0', 'translate-y-4');
+                    revealedActions.classList.remove('hidden');
+                }, 200);
+
+                btnText.textContent = "隱藏題詞";
+                showToast("✨ 木凜生圖題詞已顯現");
+            } else {
+                poemBox.classList.add('opacity-0', 'translate-y-4');
+                setTimeout(() => {
+                    poemBox.classList.add('hidden');
+                    unrevealedState.classList.remove('hidden');
+                    void unrevealedState.offsetWidth;
+                    unrevealedState.classList.remove('opacity-0');
+                    revealedActions.classList.add('hidden');
+                }, 200);
+
+                btnText.textContent = "✨ 顯現題詞 ✨";
+            }
+        }
+
+        function toggleLayout() {
+            isVertical = !isVertical;
+            const poemWrapper = document.getElementById('poemTextWrapper');
+            if (isVertical) {
+                poemWrapper.classList.add('writing-vertical', 'h-[280px]');
+                showToast("切換為古典直排");
+            } else {
+                poemWrapper.classList.remove('writing-vertical', 'h-[280px]');
+                showToast("切換為現代橫排");
+            }
+        }
+
+        function openLightbox() {
+            const current = galleryData[currentIndex];
+            document.getElementById('lightboxImage').src = current.image;
+            document.getElementById('lightboxModal').classList.remove('hidden');
+        }
+
+        function closeLightbox() {
+            document.getElementById('lightboxModal').classList.add('hidden');
+        }
+
+        function copyPoem() {
+            const poem = galleryData[currentIndex].poem;
+            navigator.clipboard.writeText(poem).then(() => {
+                showToast("題詞已成功複製到剪貼簿！");
+            });
+        }
+
+        function toggleLike() {
+            galleryData[currentIndex].likes++;
+            document.getElementById('likeCount').textContent = galleryData[currentIndex].likes;
+            showToast("心動 +1 💖");
+        }
+
+        /* ----- 管理員解鎖邏輯 ----- */
+        function toggleAdminPrompt() {
+            if (!isAdmin) {
+                let pwd = prompt("請輸入木凜管理者解鎖密碼：");
+                if (pwd === ADMIN_PASSWORD) {
+                    isAdmin = true;
+                    applyAdminUI();
+                    showToast("歡迎木凜！已解鎖新增與刪除權限");
+                } else if (pwd !== null) {
+                    alert("密碼錯誤！只有木凜本人可操作。");
+                }
+            } else {
+                isAdmin = false;
+                applyAdminUI();
+                showToast("已退出管理者模式");
+            }
+        }
+
+        function applyAdminUI() {
+            const addBtn = document.getElementById('adminAddBtn');
+            const deleteBtn = document.getElementById('adminDeleteBtn');
+            const lockBtn = document.getElementById('adminLockBtn');
+
+            if (isAdmin) {
+                addBtn.classList.remove('hidden');
+                deleteBtn.classList.remove('hidden');
+                lockBtn.classList.add('text-gothicPink', 'border-gothicPink');
+                lockBtn.innerHTML = '<i data-lucide="lock-open" class="w-3.5 h-3.5"></i> 木凜 (已解鎖)';
+            } else {
+                addBtn.classList.add('hidden');
+                deleteBtn.classList.add('hidden');
+                lockBtn.classList.remove('text-gothicPink', 'border-gothicPink');
+                lockBtn.innerHTML = '<i data-lucide="lock" class="w-3.5 h-3.5"></i> 木凜管理解鎖 (Delete)';
+            }
+            lucide.createIcons();
+        }
+
+        // 讀取電腦本地選擇的圖片檔案
+        function handleFileSelect(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(evt) {
+                    tempBase64Image = evt.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function handleAddNewArtwork(e) {
+            e.preventDefault();
+            if (!isAdmin) return;
+
+            const title = document.getElementById('inputTitle').value;
+            const style = document.getElementById('inputStyle').value;
+            const poem = document.getElementById('inputPoem').value;
+
+            if (!tempBase64Image) {
+                alert("請從電腦選擇圖片！");
+                return;
+            }
+
+            const newItem = {
+                id: Date.now(),
+                title: title,
+                style: style,
+                image: tempBase64Image,
+                poem: poem,
+                likes: 1
+            };
+
+            galleryData.unshift(newItem);
+            closeModal('uploadModal');
+            loadArtwork(0);
+            showToast("成功加入作品！");
+            
+            // 重置欄位
+            e.target.reset();
+            tempBase64Image = "";
+        }
+
+        function deleteCurrentArtwork() {
+            if (!isAdmin) return;
+            if (confirm(`確定要刪除作品「${galleryData[currentIndex].title}」嗎？`)) {
+                galleryData.splice(currentIndex, 1);
+                if (galleryData.length === 0) {
+                    galleryData = [{ title: "無作品", style: "-", image: "", poem: "目前沒有任何作品。", likes: 0 }];
+                }
+                currentIndex = 0;
+                loadArtwork(0);
+                showToast("作品已刪除");
+            }
+        }
+
+        function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
+        function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
+
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toastMsg').textContent = msg;
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            setTimeout(() => {
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 2500);
+        }
+
+        // 背景微光粒子動畫
+        function initGothicCanvas() {
+            const canvas = document.getElementById('gothicCanvas');
+            const ctx = canvas.getContext('2d');
+            let particles = [];
+
+            function resize() {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+            }
+            window.addEventListener('resize', resize);
+            resize();
+
+            const colors = ['#ec4899', '#7c3aed', '#f43f5e', '#a855f7'];
+
+            for (let i = 0; i < 40; i++) {
+                particles.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    radius: Math.random() * 2.5 + 0.8,
+                    color: colors[Math.floor(Math.random() * colors.length)],
+                    vy: -(Math.random() * 0.4 + 0.1),
+                    vx: (Math.random() - 0.5) * 0.2,
+                    opacity: Math.random() * 0.7 + 0.2
+                });
+            }
+
+            function animate() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                particles.forEach(p => {
+                    p.y += p.vy;
+                    p.x += p.vx;
+                    if (p.y < 0) p.y = canvas.height;
+                    if (p.x < 0) p.x = canvas.width;
+                    if (p.x > canvas.width) p.x = 0;
+
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+                    ctx.fillStyle = p.color;
+                    ctx.globalAlpha = p.opacity;
+                    ctx.shadowBlur = 12;
+                    ctx.shadowColor = p.color;
+                    ctx.fill();
+                });
+                requestAnimationFrame(animate);
+            }
+            animate();
+        }
+    </script>
+</body>
+</html>
